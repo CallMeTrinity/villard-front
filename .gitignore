@@ -2,4 +2,6 @@
 /.idea
 /design.md
 /design
-.env.*
+.env.local
+.env.*.local
+

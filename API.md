@@ -10,12 +10,13 @@ Ce fichier est conçu pour être copié à la racine du repo front et lu directe
 
 ## 1. Base URL & environnements
 
-| Env | URL | Notes |
-|-----|-----|-------|
+| Env       | URL                         | Notes                            |
+|-----------|-----------------------------|----------------------------------|
 | Dev local | `http://127.0.0.1:8000/api` | lancé via `symfony server:start` |
-| Prod | _(à définir)_ | |
+| Prod      | _(à définir)_               |                                  |
 
-CORS dev : tout `http(s)://localhost` ou `127.0.0.1` sur n'importe quel port est autorisé. Méthodes autorisées : `GET, POST, PUT, PATCH, DELETE, OPTIONS`. Headers : `Content-Type`, `Authorization`.
+CORS dev : tout `http(s)://localhost` ou `127.0.0.1` sur n'importe quel port est autorisé. Méthodes autorisées :
+`GET, POST, PUT, PATCH, DELETE, OPTIONS`. Headers : `Content-Type`, `Authorization`.
 
 Documentation interactive Swagger : `GET /api/docs` (accès public).
 
@@ -38,8 +39,11 @@ Content-Type: application/json
 ```
 
 **Réponse 200**
+
 ```json
-{ "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...." }
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...."
+}
 ```
 
 **Réponse 401** : identifiants invalides.
@@ -52,8 +56,10 @@ Joindre le token sur **toutes** les requêtes API :
 Authorization: Bearer <token>
 ```
 
-- **TTL** : 3600 s (1 h). Au-delà → `401`. Pas de refresh token côté serveur pour l'instant : refaire un `POST /api/login`.
-- Le claim d'identité du JWT est `uuid` (UUID immuable de l'utilisateur) → renommer son `username` n'invalide pas un token déjà émis.
+- **TTL** : 3600 s (1 h). Au-delà → `401`. Pas de refresh token côté serveur pour l'instant : refaire un
+  `POST /api/login`.
+- Le claim d'identité du JWT est `uuid` (UUID immuable de l'utilisateur) → renommer son `username` n'invalide pas un
+  token déjà émis.
 
 ### 2.3 Rôles
 
@@ -68,12 +74,12 @@ Voir la matrice de permissions par ressource ci-dessous.
 
 API Platform expose deux formats. **Recommandé pour le front : JSON pur.**
 
-| Header | Format |
-|--------|--------|
-| `Accept: application/json` | JSON pur (sans hypermedia) |
-| `Accept: application/ld+json` (défaut) | JSON-LD avec `@id`, `@type`, `hydra:*` |
-| `Content-Type: application/json` | pour `POST` / `PUT` |
-| `Content-Type: application/merge-patch+json` | **obligatoire** pour `PATCH` |
+| Header                                       | Format                                 |
+|----------------------------------------------|----------------------------------------|
+| `Accept: application/json`                   | JSON pur (sans hypermedia)             |
+| `Accept: application/ld+json` (défaut)       | JSON-LD avec `@id`, `@type`, `hydra:*` |
+| `Content-Type: application/json`             | pour `POST` / `PUT`                    |
+| `Content-Type: application/merge-patch+json` | **obligatoire** pour `PATCH`           |
 
 ### 3.1 Pagination & collections
 
@@ -84,7 +90,13 @@ Les `GET` de collection (`/api/categories`, etc.) retournent par défaut un obje
   "@context": "/api/contexts/Category",
   "@id": "/api/categories",
   "@type": "hydra:Collection",
-  "hydra:member": [ { "@id": "/api/categories/1", "id": 1, "name": "Cuisine" } ],
+  "hydra:member": [
+    {
+      "@id": "/api/categories/1",
+      "id": 1,
+      "name": "Cuisine"
+    }
+  ],
   "hydra:totalItems": 1
 }
 ```
@@ -95,52 +107,60 @@ Paramètres de pagination standard d'API Platform : `?page=2&itemsPerPage=20`.
 
 ### 3.2 Erreurs
 
-| Code | Sens |
-|------|------|
-| `400` | JSON invalide / contraintes de validation |
-| `401` | Token absent, invalide, expiré |
-| `403` | Authentifié mais pas autorisé (mauvais rôle / pas propriétaire) |
-| `404` | Ressource inexistante |
+| Code  | Sens                                                               |
+|-------|--------------------------------------------------------------------|
+| `400` | JSON invalide / contraintes de validation                          |
+| `401` | Token absent, invalide, expiré                                     |
+| `403` | Authentifié mais pas autorisé (mauvais rôle / pas propriétaire)    |
+| `404` | Ressource inexistante                                              |
 | `415` | Mauvais `Content-Type` (typiquement PATCH sans `merge-patch+json`) |
-| `422` | Validation Symfony (Hydra `ConstraintViolationList`) |
+| `422` | Validation Symfony (Hydra `ConstraintViolationList`)               |
 
 ---
 
 ## 4. Ressources
 
 URI = pluralisation d'API Platform (snake_case en pluriel anglais).
-Chaque ressource expose les opérations REST standard : `GET /collection`, `GET /{id}`, `POST /collection`, `PUT /{id}`, `PATCH /{id}`, `DELETE /{id}`.
+Chaque ressource expose les opérations REST standard : `GET /collection`, `GET /{id}`, `POST /collection`, `PUT /{id}`,
+`PATCH /{id}`, `DELETE /{id}`.
 
 ### 4.1 User — `/api/users`
 
 Authentification système. **Identifiant URL = `id` numérique.** L'`uuid` est interne (JWT).
 
-| Op | Sécurité |
-|----|----------|
-| GET (collection / item) | `ROLE_USER` |
-| POST | `ROLE_ADMIN` |
-| PUT / PATCH | `ROLE_ADMIN` **ou** être l'utilisateur lui-même |
-| DELETE | `ROLE_ADMIN` |
+| Op                      | Sécurité                                        |
+|-------------------------|-------------------------------------------------|
+| GET (collection / item) | `ROLE_USER`                                     |
+| POST                    | `ROLE_ADMIN`                                    |
+| PUT / PATCH             | `ROLE_ADMIN` **ou** être l'utilisateur lui-même |
+| DELETE                  | `ROLE_ADMIN`                                    |
 
 **Lecture (`user:read`)**
+
 ```json
 {
   "id": 1,
   "username": "alice",
-  "roles": ["ROLE_USER"]
+  "roles": [
+    "ROLE_USER"
+  ]
 }
 ```
 
-**Écriture (`user:write`)** — seul `username` est exposé en write par les groupes de sérialisation. Le mot de passe n'est pas modifiable via cet endpoint (à terme : commande CLI `app:create-user`, cf. `CreateUserCommand`).
+**Écriture (`user:write`)** — seul `username` est exposé en write par les groupes de sérialisation. Le mot de passe
+n'est pas modifiable via cet endpoint (à terme : commande CLI `app:create-user`, cf. `CreateUserCommand`).
 
 ### 4.2 Category — `/api/categories`
 
-| Op | Sécurité |
-|----|----------|
+| Op                                | Sécurité    |
+|-----------------------------------|-------------|
 | GET / POST / PUT / PATCH / DELETE | `ROLE_USER` |
 
 ```json
-{ "id": 1, "name": "Cuisine" }
+{
+  "id": 1,
+  "name": "Cuisine"
+}
 ```
 
 Relations exposées par défaut (JSON-LD) : `inventoryItems`, `shoppingItems` (IRIs).
@@ -149,10 +169,10 @@ Relations exposées par défaut (JSON-LD) : `inventoryItems`, `shoppingItems` (I
 
 Inventaire de l'appartement. `category` est **obligatoire**.
 
-| Op | Sécurité |
-|----|----------|
-| GET / POST / PUT / PATCH | `ROLE_USER` |
-| DELETE | `ROLE_ADMIN` |
+| Op                       | Sécurité     |
+|--------------------------|--------------|
+| GET / POST / PUT / PATCH | `ROLE_USER`  |
+| DELETE                   | `ROLE_ADMIN` |
 
 ```json
 {
@@ -169,10 +189,10 @@ Pour `POST` / `PUT` : passer la category en IRI (`"/api/categories/1"`) — conv
 
 Liste de courses. `category` est **optionnelle**.
 
-| Op | Sécurité |
-|----|----------|
-| GET / POST / PUT / PATCH | `ROLE_USER` |
-| DELETE | `ROLE_ADMIN` |
+| Op                       | Sécurité     |
+|--------------------------|--------------|
+| GET / POST / PUT / PATCH | `ROLE_USER`  |
+| DELETE                   | `ROLE_ADMIN` |
 
 ```json
 {
@@ -186,11 +206,11 @@ Liste de courses. `category` est **optionnelle**.
 
 ### 4.5 Note — `/api/notes`
 
-| Op | Sécurité |
-|----|----------|
-| GET (collection / item) | `ROLE_USER` |
-| POST | `ROLE_ADMIN` **ou** auteur = utilisateur courant |
-| PUT / PATCH / DELETE | `ROLE_ADMIN` **ou** auteur de la note |
+| Op                      | Sécurité                                         |
+|-------------------------|--------------------------------------------------|
+| GET (collection / item) | `ROLE_USER`                                      |
+| POST                    | `ROLE_ADMIN` **ou** auteur = utilisateur courant |
+| PUT / PATCH / DELETE    | `ROLE_ADMIN` **ou** auteur de la note            |
 
 ```json
 {
@@ -202,17 +222,18 @@ Liste de courses. `category` est **optionnelle**.
 }
 ```
 
-> ⚠️ En `POST`, `author` doit pointer sur l'utilisateur courant (sauf admin). `createdAt` n'est pas auto-rempli pour l'instant côté serveur → l'envoyer depuis le front.
+> ⚠️ En `POST`, `author` doit pointer sur l'utilisateur courant (sauf admin). `createdAt` n'est pas auto-rempli pour l'
+> instant côté serveur → l'envoyer depuis le front.
 
 ### 4.6 Occupation — `/api/occupations`
 
 Calendrier d'occupation de l'appartement.
 
-| Op | Sécurité |
-|----|----------|
-| GET (collection / item) | `ROLE_USER` |
-| POST | `ROLE_ADMIN` **ou** `occupant` = utilisateur courant |
-| PUT / PATCH / DELETE | `ROLE_ADMIN` **ou** occupant de la période |
+| Op                      | Sécurité                                             |
+|-------------------------|------------------------------------------------------|
+| GET (collection / item) | `ROLE_USER`                                          |
+| POST                    | `ROLE_ADMIN` **ou** `occupant` = utilisateur courant |
+| PUT / PATCH / DELETE    | `ROLE_ADMIN` **ou** occupant de la période           |
 
 ```json
 {
@@ -236,27 +257,27 @@ Dates au format ISO 8601 (`YYYY-MM-DD` accepté pour les `date_immutable`).
 const API = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api'
 
 async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('jwt')
-  const res = await fetch(`${API}${path}`, {
-    ...init,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init.headers,
-    },
-  })
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-  return res.status === 204 ? (undefined as T) : res.json()
+    const token = localStorage.getItem('jwt')
+    const res = await fetch(`${API}${path}`, {
+        ...init,
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...(token ? {Authorization: `Bearer ${token}`} : {}),
+            ...init.headers,
+        },
+    })
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+    return res.status === 204 ? (undefined as T) : res.json()
 }
 ```
 
 ### 5.2 Login
 
 ```ts
-const { token } = await api<{ token: string }>('/login', {
-  method: 'POST',
-  body: JSON.stringify({ username, password }),
+const {token} = await api<{ token: string }>('/login', {
+    method: 'POST',
+    body: JSON.stringify({username, password}),
 })
 localStorage.setItem('jwt', token)
 ```
@@ -271,9 +292,9 @@ const items = await api<ShoppingItem[]>('/shopping_items')
 
 ```ts
 await api(`/shopping_items/${id}`, {
-  method: 'PATCH',
-  headers: { 'Content-Type': 'application/merge-patch+json' },
-  body: JSON.stringify({ purchased: true }),
+    method: 'PATCH',
+    headers: {'Content-Type': 'application/merge-patch+json'},
+    body: JSON.stringify({purchased: true}),
 })
 ```
 
@@ -281,13 +302,13 @@ await api(`/shopping_items/${id}`, {
 
 ```ts
 await api('/occupations', {
-  method: 'POST',
-  body: JSON.stringify({
-    startDate: '2026-07-01',
-    endDate: '2026-07-15',
-    notes: 'Vacances',
-    occupant: '/api/users/2', // IRI du user connecté
-  }),
+    method: 'POST',
+    body: JSON.stringify({
+        startDate: '2026-07-01',
+        endDate: '2026-07-15',
+        notes: 'Vacances',
+        occupant: '/api/users/2', // IRI du user connecté
+    }),
 })
 ```
 
@@ -295,12 +316,17 @@ await api('/occupations', {
 
 ## 6. Conventions importantes pour l'agent front
 
-1. **Toujours utiliser les IRIs** (`"/api/users/2"`) pour les relations en écriture, pas les objets imbriqués ni les ids nus.
+1. **Toujours utiliser les IRIs** (`"/api/users/2"`) pour les relations en écriture, pas les objets imbriqués ni les ids
+   nus.
 2. **PATCH** → `Content-Type: application/merge-patch+json` sinon `415`.
-3. Préférer `Accept: application/json` pour des payloads plats ; passer en `application/ld+json` uniquement si on a besoin de l'hypermedia/pagination Hydra.
+3. Préférer `Accept: application/json` pour des payloads plats ; passer en `application/ld+json` uniquement si on a
+   besoin de l'hypermedia/pagination Hydra.
 4. Le JWT expire au bout d'1 h : prévoir un intercepteur qui, sur `401`, déconnecte et redirige vers le login.
-5. **Pas de breaking changes côté serveur** : si le front a besoin d'un champ supplémentaire ou d'un endpoint custom, ouvrir une issue plutôt que de bidouiller. L'API doit rester consommable par d'autres clients (mobile à venir).
-6. La pluralisation des URLs suit la convention API Platform : `Category → categories`, `InventoryItem → inventory_items`, `ShoppingItem → shopping_items`, `Note → notes`, `Occupation → occupations`, `User → users`.
+5. **Pas de breaking changes côté serveur** : si le front a besoin d'un champ supplémentaire ou d'un endpoint custom,
+   ouvrir une issue plutôt que de bidouiller. L'API doit rester consommable par d'autres clients (mobile à venir).
+6. La pluralisation des URLs suit la convention API Platform : `Category → categories`,
+   `InventoryItem → inventory_items`, `ShoppingItem → shopping_items`, `Note → notes`, `Occupation → occupations`,
+   `User → users`.
 
 ---
 
@@ -308,7 +334,8 @@ await api('/occupations', {
 
 À demander au backend si besoin côté front :
 
-- `GET /api/me` (profil de l'utilisateur courant) — actuellement il faut récupérer l'id depuis le JWT décodé ou faire `GET /api/users` + filtrer.
+- `GET /api/me` (profil de l'utilisateur courant) — actuellement il faut récupérer l'id depuis le JWT décodé ou faire
+  `GET /api/users` + filtrer.
 - Refresh token.
 - Auto-remplissage de `createdAt` sur `Note` côté serveur.
 - Filtres / recherche (API Platform `SearchFilter`) sur les ressources.
