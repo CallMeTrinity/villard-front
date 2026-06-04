@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import Icon from '@/components/icons/Icon.vue'
+import {useRouter} from "vue-router";
+import {useAuthStore} from "@/stores/auth";
 
+const router = useRouter()
+const authStore = useAuthStore()
+
+function onLogout() {
+  authStore.logout()
+  router.push({name: 'login'})
+}
 interface NavItem {
   to: string
   label: string
@@ -30,6 +39,7 @@ const gestion: NavItem[] = [
           <div class="brand-name">Les Marmottes</div>
           <div class="brand-sub">Villard-de-Lans</div>
         </div>
+        <button @click="onLogout">Logout</button>
       </div>
     </div>
 
