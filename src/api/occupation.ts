@@ -19,6 +19,7 @@ export interface OccupationUpdatePayload {
     startDate?: string,
     endDate?: string,
     notes?: string,
+    occupant?: string,
 }
 
 export const occupationsApi = {

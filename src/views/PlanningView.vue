@@ -115,6 +115,7 @@ async function onSave(payload: {
         startDate: payload.startDate,
         endDate: payload.endDate,
         notes: payload.notes || undefined,
+        occupant: payload.occupant,
       })
     }
     closeModal()
