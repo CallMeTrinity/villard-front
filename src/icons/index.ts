@@ -27,4 +27,10 @@ export const ICONS: Record<string, string> = {
   cols: `<rect x="3.5" y="4" width="5" height="16" rx="1.5" ${P}/><rect x="9.5" y="4" width="5" height="16" rx="1.5" ${P}/><rect x="15.5" y="4" width="5" height="16" rx="1.5" ${P}/>`,
   list: `<path d="M4 6.5h16M4 12h16M4 17.5h16" ${P}/>`,
   arrow: `<path d="M5 12h14M13 6l6 6-6 6" ${P}/>`,
+  pin: `<path d="M12 21s6.5-6 6.5-10.5a6.5 6.5 0 0 0-13 0C5.5 15 12 21 12 21z" ${P}/><circle cx="12" cy="10.5" r="2.2" ${P}/>`,
+  linen: `<path d="M4 8.5 8 5h8l4 3.5-2 2V19a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-8.5z" ${P}/><path d="M9 5c0 1.8 1.3 3 3 3s3-1.2 3-3" ${P}/>`,
+  dish: `<circle cx="12" cy="12" r="8" ${P}/><circle cx="12" cy="12" r="3" ${P}/>`,
+  bath: `<path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z" ${P}/><path d="M6 12V6.5A2 2 0 0 1 8 4.5a2 2 0 0 1 2 2" ${P}/><path d="M6.5 19l-1 2M17.5 19l1 2" ${P}/>`,
+  refresh: `<path d="M4 12a8 8 0 0 1 13.5-5.8L20 8M20 4v4h-4" ${P}/><path d="M20 12a8 8 0 0 1-13.5 5.8L4 16M4 20v-4h4" ${P}/>`,
+  edit: `<path d="M5 19h3l9.5-9.5a2 2 0 0 0-3-3L5 16z" ${P}/><path d="M14 7l3 3" ${P}/>`,
 }
