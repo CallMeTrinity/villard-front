@@ -50,6 +50,11 @@ const selectedOccupant = computed(() =>
   props.occupants.find(o => o.iri === occupantIri.value) ?? null
 )
 
+// Le backend peut renvoyer un datetime ISO complet ; <input type="date"> exige 'YYYY-MM-DD'.
+function toDateInput(iso: string): string {
+  return iso.split('T')[0]
+}
+
 watch(() => props.open, (open) => {
   if (!open) return
   errorMessage.value = null
@@ -58,13 +63,13 @@ watch(() => props.open, (open) => {
   if (!init) return
   if (init.mode === 'edit') {
     occupantIri.value = init.occupation.occupant
-    startDate.value = init.occupation.startDate
-    endDate.value = init.occupation.endDate
+    startDate.value = toDateInput(init.occupation.startDate)
+    endDate.value = toDateInput(init.occupation.endDate)
     notes.value = init.occupation.notes ?? ''
   } else {
     occupantIri.value = init.occupantIri
-    startDate.value = init.startDate
-    endDate.value = init.endDate
+    startDate.value = toDateInput(init.startDate)
+    endDate.value = toDateInput(init.endDate)
     notes.value = ''
   }
 }, { immediate: true })

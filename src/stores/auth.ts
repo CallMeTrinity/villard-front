@@ -9,7 +9,9 @@ export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null)
 
     const isAuthenticated = computed(() => !!token.value)
-    const userIri = computed(()=> user.value ? `/api/users/${user.value.id}` : null)
+    // L'IRI réel de l'utilisateur n'est pas dans /api/me (cf. api/auth.ts) :
+    // il faut le résoudre via la liste /api/users + uuid. Voir PlanningView pour l'usage.
+    const userUuid = computed(() => user.value?.uuid ?? null)
 
     async function login(payload: LoginPayload) {
         const {data} = await authApi.login(payload)
@@ -34,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
         token,
         user,
         isAuthenticated,
-        userIri,
+        userUuid,
         login,
         fetchCurrentUser,
         logout,

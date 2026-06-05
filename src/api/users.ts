@@ -1,7 +1,9 @@
 import { apiClient } from './client'
 
 export interface ApiUser {
-  id: number
+  '@id': string
+  '@type': 'User'
+  uuid: string
   username: string
   roles: string[]
 }
@@ -10,10 +12,6 @@ export const usersApi = {
   list() {
     return apiClient.get<ApiUser[]>('/api/users')
   },
-}
-
-export function userIri(id: number): string {
-  return `/api/users/${id}`
 }
 
 export function idFromIri(iri: string): number | null {

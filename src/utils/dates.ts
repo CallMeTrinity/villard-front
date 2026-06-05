@@ -15,7 +15,10 @@ export function todayMidday(): Date {
 }
 
 export function parseISO(s: string): Date {
-  const [y, m, d] = s.split('-').map(Number)
+  // Accepte 'YYYY-MM-DD' ou un ISO datetime complet ('YYYY-MM-DDTHH:mm:ss+ZZ:ZZ').
+  // On garde uniquement la partie date pour éviter les décalages de fuseau.
+  const datePart = s.split('T')[0]
+  const [y, m, d] = datePart.split('-').map(Number)
   return new Date(y, m - 1, d, 12)
 }
 

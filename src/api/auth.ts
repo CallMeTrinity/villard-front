@@ -9,8 +9,11 @@ export interface LoginResponse {
     token: string
 }
 
+// Note : /api/me renvoie actuellement `@id: "/api/me"` (l'URL de l'endpoint)
+// et n'expose pas le champ `id` numérique de l'utilisateur. On déduit l'IRI réel
+// via une recherche par `uuid` dans la liste /api/users (cf. composable/useUsers).
 export interface User {
-    id: number,
+    '@id': string,
     uuid: string,
     username: string,
     roles: string[]

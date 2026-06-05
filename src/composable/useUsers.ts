@@ -19,6 +19,7 @@ const PALETTE: PaletteEntry[] = [
 
 export interface DisplayUser {
   id: number
+  uuid: string
   iri: string
   username: string
   short: string
@@ -36,10 +37,13 @@ function initials(name: string): string {
 }
 
 function decorate(u: ApiUser): DisplayUser {
-  const palette = PALETTE[u.id % PALETTE.length]
+  // L'API ne renvoie pas `id` ; on l'extrait de @id (ex. "/api/users/14" → 14)
+  const id = idFromIri(u['@id']) ?? 0
+  const palette = PALETTE[id % PALETTE.length]
   return {
-    id: u.id,
-    iri: `/api/users/${u.id}`,
+    id,
+    uuid: u.uuid,
+    iri: u['@id'],
     username: u.username,
     short: initials(u.username),
     color: palette.color,
@@ -75,11 +79,16 @@ export function useUsers() {
     return byIri.value[iri] ?? null
   }
 
+  function findByUuid(uuid: string): DisplayUser | null {
+    return items.value.find(u => u.uuid === uuid) ?? null
+  }
+
   function fallback(iri: string): DisplayUser {
     const id = idFromIri(iri) ?? 0
     const palette = PALETTE[id % PALETTE.length]
     return {
       id,
+      uuid: '',
       iri,
       username: `Utilisateur #${id}`,
       short: '??',
@@ -90,5 +99,5 @@ export function useUsers() {
 
   onMounted(fetchAll)
 
-  return { items, state, errorMessage, byIri, resolve, fallback, fetchAll }
+  return { items, state, errorMessage, byIri, resolve, findByUuid, fallback, fetchAll }
 }

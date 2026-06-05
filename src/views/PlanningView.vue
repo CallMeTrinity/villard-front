@@ -35,6 +35,12 @@ const modalOpen = ref(false)
 const modalInitial = ref<ModalInitial | null>(null)
 const actionError = ref<string | null>(null)
 
+// /api/me ne renvoie pas l'IRI réel de l'utilisateur. On le retrouve dans la liste users via uuid.
+const currentUserIri = computed<string | null>(() => {
+  if (!auth.userUuid) return null
+  return users.findByUuid(auth.userUuid)?.iri ?? null
+})
+
 function resolveUser(iri: string) {
   return users.resolve(iri) ?? users.fallback(iri)
 }
@@ -73,7 +79,7 @@ function openNew(start?: Date) {
     mode: 'create',
     startDate: fmtISO(startDay),
     endDate: fmtISO(addDays(startDay, 1)),
-    occupantIri: auth.userIri ?? users.items.value[0]?.iri ?? '',
+    occupantIri: currentUserIri.value ?? users.items.value[0]?.iri ?? '',
   }
   modalOpen.value = true
 }
@@ -140,7 +146,7 @@ const isAdmin = computed(() => auth.user?.roles.includes('ROLE_ADMIN') ?? false)
 
 function canEditOrDelete(occ: Occupation): boolean {
   if (isAdmin.value) return true
-  return occ.occupant === auth.userIri
+  return occ.occupant === currentUserIri.value
 }
 
 const monthRangeLabel = computed(() => {
@@ -247,7 +253,7 @@ const monthRangeLabel = computed(() => {
     :open="modalOpen"
     :initial="modalInitial"
     :occupants="users.items.value"
-    :current-user-iri="auth.userIri"
+    :current-user-iri="currentUserIri"
     :can-delete="modalInitial?.mode === 'edit' && canEditOrDelete(modalInitial.occupation)"
     @close="closeModal"
     @save="onSave"
