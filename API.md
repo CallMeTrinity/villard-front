@@ -10,10 +10,10 @@ Ce fichier est conçu pour être copié à la racine du repo front et lu directe
 
 ## 1. Base URL & environnements
 
-| Env       | URL                         | Notes                            |
-|-----------|-----------------------------|----------------------------------|
-| Dev local | `http://127.0.0.1:8000/api` | lancé via `symfony server:start` |
-| Prod      | _(à définir)_               |                                  |
+| Env       | URL                        | Notes                            |
+|-----------|----------------------------|----------------------------------|
+| Dev local | `http://127.0.0.1:8000` | lancé via `symfony server:start` |
+| Prod      | _(à définir)_              |                                  |
 
 CORS dev : tout `http(s)://localhost` ou `127.0.0.1` sur n'importe quel port est autorisé. Méthodes autorisées :
 `GET, POST, PUT, PATCH, DELETE, OPTIONS`. Headers : `Content-Type`, `Authorization`.
@@ -334,7 +334,6 @@ await api('/occupations', {
 
 À demander au backend si besoin côté front :
 
-- `GET /api/me` (profil de l'utilisateur courant) — actuellement il faut récupérer l'id depuis le JWT décodé ou faire
   `GET /api/users` + filtrer.
 - Refresh token.
 - Auto-remplissage de `createdAt` sur `Note` côté serveur.

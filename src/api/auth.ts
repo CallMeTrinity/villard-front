@@ -13,6 +13,7 @@ export interface User {
     id: number,
     uuid: string,
     username: string,
+    roles: string[]
 }
 
 export const authApi = {

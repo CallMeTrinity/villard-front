@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null)
 
     const isAuthenticated = computed(() => !!token.value)
+    const userIri = computed(()=> user.value ? `/api/users/${user.value.id}` : null)
 
     async function login(payload: LoginPayload) {
         const {data} = await authApi.login(payload)
@@ -33,6 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
         token,
         user,
         isAuthenticated,
+        userIri,
         login,
         fetchCurrentUser,
         logout,
