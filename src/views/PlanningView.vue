@@ -54,7 +54,7 @@ const title = computed(() => {
 
 const current = computed<Occupation | null>(() => {
   for (const o of occupations.items.value) {
-    if (parseISO(o.startDate) <= TODAY && parseISO(o.endDate) > TODAY) return o
+    if (parseISO(o.startDate) <= TODAY && parseISO(o.endDate) >= TODAY) return o
   }
   return null
 })
@@ -206,7 +206,7 @@ const monthRangeLabel = computed(() => {
             />
             <span v-if="current">
               Actuellement&nbsp;: <b>{{ resolveUser(current.occupant).username }}</b>
-              <span class="muted"> · jusqu'au {{ addDays(parseISO(current.endDate), -1).getDate() }} {{ MONTHS_ABBR[addDays(parseISO(current.endDate), -1).getMonth()] }}</span>
+              <span class="muted"> · jusqu'au {{ parseISO(current.endDate).getDate() }} {{ MONTHS_ABBR[parseISO(current.endDate).getMonth()] }}</span>
             </span>
             <span v-else>
               Appartement <b>libre</b> aujourd'hui

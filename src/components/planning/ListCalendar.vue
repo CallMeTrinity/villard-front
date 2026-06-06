@@ -49,11 +49,11 @@ const groups = computed<Group[]>(() => {
 })
 
 function isPast(o: Occupation): boolean {
-  return parseISO(o.endDate) <= TODAY
+  return parseISO(o.endDate) < TODAY
 }
 
 function isCurrent(o: Occupation): boolean {
-  return parseISO(o.startDate) <= TODAY && parseISO(o.endDate) > TODAY
+  return parseISO(o.startDate) <= TODAY && parseISO(o.endDate) >= TODAY
 }
 
 function startDay(o: Occupation): number {

@@ -65,7 +65,7 @@ export function nights(startISO: string, endISO: string): number {
 
 export function fmtRange(startISO: string, endISO: string): string {
   const s = parseISO(startISO)
-  const e = addDays(parseISO(endISO), -1)
+  const e = parseISO(endISO)
   const sameMonth = s.getMonth() === e.getMonth()
   if (sameDay(s, e)) return `${s.getDate()} ${MONTHS_ABBR[s.getMonth()]}`
   if (sameMonth) return `${s.getDate()}–${e.getDate()} ${MONTHS_ABBR[s.getMonth()]}`

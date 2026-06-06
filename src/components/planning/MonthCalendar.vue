@@ -43,20 +43,22 @@ const weeks = computed<Date[]>(() => {
 
 function segmentsForWeek(weekStart: Date): Segment[] {
   const weekEnd = addDays(weekStart, 7)
+  // Jour de départ visuellement inclus : on étend la fin d'un jour pour l'affichage.
+  const visualEnd = (o: Occupation) => addDays(parseISO(o.endDate), 1)
   const overlap = props.occupations
-    .filter(o => parseISO(o.startDate) < weekEnd && parseISO(o.endDate) > weekStart)
+    .filter(o => parseISO(o.startDate) < weekEnd && visualEnd(o) > weekStart)
     .sort((a, b) => {
       const da = parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()
       if (da !== 0) return da
-      const lb = dayDiff(parseISO(b.startDate), parseISO(b.endDate))
-      const la = dayDiff(parseISO(a.startDate), parseISO(a.endDate))
+      const lb = dayDiff(parseISO(b.startDate), visualEnd(b))
+      const la = dayDiff(parseISO(a.startDate), visualEnd(a))
       return lb - la
     })
 
   const lanes: number[] = []
   return overlap.map(o => {
     const rawStart = parseISO(o.startDate)
-    const rawEnd = parseISO(o.endDate)
+    const rawEnd = visualEnd(o)
     const s = rawStart < weekStart ? weekStart : rawStart
     const e = rawEnd > weekEnd ? weekEnd : rawEnd
     const startCol = dayDiff(weekStart, s)
