@@ -223,3 +223,60 @@
   .arc-principles { grid-template-columns: 1fr; }
   .inv-summary { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ============================================================
+   Responsive — sub-768px (phone) tweaks for content modules
+   ============================================================ */
+@media (max-width: 767.98px) {
+  .filt-bar { gap: 8px; margin-bottom: 12px; }
+  .filt-bar .push-right { margin-left: 0; }
+  .seg { width: 100%; }
+  .seg button { flex: 1; justify-content: center; }
+  .searchbox { width: 100%; }
+
+  /* Inventaire */
+  .inv-summary { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+  .sum-v { font-size: 24px; }
+  .sumcard { padding: 12px 13px; }
+  .inv-row { grid-template-columns: 1fr; gap: 8px; padding: 12px; }
+  .inv-row .tag,
+  .inv-row .stepper,
+  .inv-row .btn.icon { justify-self: start; }
+  .inv-cat-head h3 { font-size: 15px; }
+
+  /* Courses */
+  .crs-row { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
+  .crs-row .btn.sm { justify-self: start; }
+  .crs-list { position: static; }
+
+  /* Liste planning */
+  .list-row { padding: 10px 12px; gap: 10px; }
+  .list-d { font-size: 18px; }
+  .list-meta { font-size: 11px; }
+  .occ-status { gap: 8px; margin-bottom: 12px; }
+  .status-card { padding: 9px 13px; font-size: 13px; width: 100%; }
+
+  /* Calendar — on s'assure que le mois reste consultable même si on le force pas */
+  .cal-dow-cell { padding: 7px 6px; font-size: 9.5px; }
+  .cal-cell { padding: 5px 6px; }
+
+  /* Modal */
+  .modal-scrim { padding: 0; }
+  .modal { width: 100%; max-height: 100vh; border-radius: 0; }
+  .fld-grid { grid-template-columns: 1fr; gap: 8px; }
+  .occ-pick { grid-template-columns: 1fr; }
+
+  /* Architecture */
+  .arc-lede { font-size: 15px; margin-bottom: 18px; }
+  .arc-diagram { padding: 16px; }
+  .arc-row { flex-direction: column; gap: 6px; }
+  .arc-row .arc-flow { flex-direction: column; height: 32px; }
+  .arc-row .arc-flow .arc-line { width: 1.5px; height: 100%; background: repeating-linear-gradient(180deg, var(--line-3) 0 5px, transparent 5px 9px); }
+  .arc-stack-row { grid-template-columns: 1fr; gap: 4px; padding: 12px 14px; }
+}
+
+/* Très petits écrans : 1 colonne summary */
+@media (max-width: 420px) {
+  .inv-summary { grid-template-columns: 1fr; }
+  .sh-summary { grid-template-columns: 1fr !important; }
+}

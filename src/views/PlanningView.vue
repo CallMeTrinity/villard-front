@@ -9,6 +9,7 @@ import OccupantsLegend from '@/components/planning/OccupantsLegend.vue'
 import OccupationModal, { type ModalInitial } from '@/components/planning/OccupationModal.vue'
 import { useOccupations } from '@/composable/useOccupations'
 import { useUsers } from '@/composable/useUsers'
+import { useUi } from '@/composable/useUi'
 import { useAuthStore } from '@/stores/auth'
 import type { Occupation } from '@/api/occupation'
 import {
@@ -26,10 +27,15 @@ type CalView = 'month' | 'list'
 const occupations = useOccupations()
 const users = useUsers()
 const auth = useAuthStore()
+const { isMobile } = useUi()
 
 const TODAY = todayMidday()
 const focus = ref<Date>(TODAY)
-const view = ref<CalView>('month')
+const userView = ref<CalView>('month')
+const view = computed<CalView>(() => (isMobile.value ? 'list' : userView.value))
+function setView(v: CalView) {
+  userView.value = v
+}
 
 const modalOpen = ref(false)
 const modalInitial = ref<ModalInitial | null>(null)
@@ -173,16 +179,16 @@ const monthRangeLabel = computed(() => {
         <Icon name="chevR" :size="16" />
       </button>
     </div>
-    <div class="seg">
-      <button :class="{ on: view === 'month' }" @click="view = 'month'">
+    <div v-if="!isMobile" class="seg">
+      <button :class="{ on: view === 'month' }" @click="setView('month')">
         <Icon name="grid" :size="14" />Mois
       </button>
-      <button :class="{ on: view === 'list' }" @click="view = 'list'">
+      <button :class="{ on: view === 'list' }" @click="setView('list')">
         <Icon name="list" :size="14" />Liste
       </button>
     </div>
     <button class="btn primary" @click="openNew()">
-      <Icon name="plus" :size="16" />Réserver
+      <Icon name="plus" :size="16" /><span class="btn-label">Réserver</span>
     </button>
   </AppTopbar>
 

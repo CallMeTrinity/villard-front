@@ -34,4 +34,7 @@ export const ICONS: Record<string, string> = {
   bath: `<path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z" ${P}/><path d="M6 12V6.5A2 2 0 0 1 8 4.5a2 2 0 0 1 2 2" ${P}/><path d="M6.5 19l-1 2M17.5 19l1 2" ${P}/>`,
   refresh: `<path d="M4 12a8 8 0 0 1 13.5-5.8L20 8M20 4v4h-4" ${P}/><path d="M20 12a8 8 0 0 1-13.5 5.8L4 16M4 20v-4h4" ${P}/>`,
   edit: `<path d="M5 19h3l9.5-9.5a2 2 0 0 0-3-3L5 16z" ${P}/><path d="M14 7l3 3" ${P}/>`,
+  logout: `<path d="M14.5 7V5.5A2 2 0 0 0 12.5 3.5h-6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V17" ${P}/><path d="M9 12h12M17 8l4 4-4 4" ${P}/>`,
+  menu: `<path d="M4 6.5h16M4 12h16M4 17.5h16" ${P}/>`,
+  mobile: `<rect x="6.5" y="2.5" width="11" height="19" rx="2.5" ${P}/><path d="M10.5 18.5h3" ${P}/>`,
 }

@@ -172,7 +172,7 @@ async function retryInitial() {
       />
     </div>
     <button class="btn primary" @click="onNew">
-      <Icon name="plus" :size="16" />Ajouter
+      <Icon name="plus" :size="16" /><span class="btn-label">Ajouter</span>
     </button>
   </AppTopbar>
 
