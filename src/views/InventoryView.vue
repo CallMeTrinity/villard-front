@@ -4,8 +4,10 @@ import { AxiosError } from 'axios'
 import AppTopbar from '@/components/shell/AppTopbar.vue'
 import Icon from '@/components/icons/Icon.vue'
 import InvRow from '@/components/inventory/InvRow.vue'
+import InventoryItemModal, { type ModalInitial } from '@/components/inventory/InventoryItemModal.vue'
 import { useInventory } from '@/composable/useInventory'
 import { useCategories } from '@/composable/useCategories'
+import { useAuthStore } from '@/stores/auth'
 import type { InventoryItem, InvState } from '@/api/inventory'
 import { STATE_FILTERS } from '@/utils/inventoryState'
 
@@ -14,11 +16,17 @@ type StateFilter = InvState | 'all'
 
 const inventory = useInventory()
 const categories = useCategories()
+const auth = useAuthStore()
+
+const isAdmin = computed(() => auth.user?.roles.includes('ROLE_ADMIN') ?? false)
 
 const cat = ref<CatFilter>('all')
 const state = ref<StateFilter>('all')
 const query = ref('')
 const actionError = ref<string | null>(null)
+
+const modalOpen = ref(false)
+const modalInitial = ref<ModalInitial | null>(null)
 
 const initialState = computed(() => {
   // Loading global = les deux ressources en cours de chargement initial.
@@ -74,12 +82,68 @@ async function onPatch(
   }
 }
 
-function onEdit(_item: InventoryItem) {
-  // TODO logique — modale d'édition (étape 4)
+function onNew() {
+  modalInitial.value = {
+    mode: 'create',
+    defaultCategory: cat.value !== 'all' ? cat.value : undefined,
+  }
+  modalOpen.value = true
 }
 
-function onNew() {
-  // TODO logique — modale de création (étape 4)
+function onEdit(item: InventoryItem) {
+  modalInitial.value = { mode: 'edit', item }
+  modalOpen.value = true
+}
+
+function closeModal() {
+  modalOpen.value = false
+  modalInitial.value = null
+}
+
+async function onSave(payload: {
+  id: number | null
+  name: string
+  quantity: number
+  state: InvState
+  location: string | null
+  note: string | null
+  category: string
+}) {
+  actionError.value = null
+  try {
+    if (payload.id === null) {
+      await inventory.create({
+        name: payload.name,
+        quantity: payload.quantity,
+        state: payload.state,
+        location: payload.location,
+        note: payload.note,
+        category: payload.category,
+      })
+    } else {
+      await inventory.update(payload.id, {
+        name: payload.name,
+        quantity: payload.quantity,
+        state: payload.state,
+        location: payload.location,
+        note: payload.note,
+        category: payload.category,
+      })
+    }
+    closeModal()
+  } catch (err) {
+    actionError.value = formatError(err)
+  }
+}
+
+async function onRemove(id: number) {
+  actionError.value = null
+  try {
+    await inventory.remove(id)
+    closeModal()
+  } catch (err) {
+    actionError.value = formatError(err)
+  }
 }
 
 function formatError(err: unknown): string {
@@ -219,6 +283,16 @@ async function retryInitial() {
       </template>
     </div>
   </div>
+
+  <InventoryItemModal
+      :open="modalOpen"
+      :initial="modalInitial"
+      :categories="categories.items.value"
+      :can-delete="isAdmin && modalInitial?.mode === 'edit'"
+      @close="closeModal"
+      @save="onSave"
+      @remove="onRemove"
+  />
 </template>
 
 <style scoped>

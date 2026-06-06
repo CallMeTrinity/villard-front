@@ -11,6 +11,7 @@ export const ICONS: Record<string, string> = {
   server: `<rect x="3.5" y="4" width="17" height="7" rx="2" ${P}/><rect x="3.5" y="13" width="17" height="7" rx="2" ${P}/><path d="M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6" ${P}/>`,
   leaf: `<path d="M5 19c0-8 5-14 14-14 0 9-5 14-14 14z" ${P}/><path d="M5 19c4-6 8-8 12-9" ${P}/>`,
   plus: `<path d="M12 5v14M5 12h14" ${P}/>`,
+  minus: `<path d="M5 12h14" ${P}/>`,
   chevL: `<path d="M14.5 6 9 12l5.5 6" ${P}/>`,
   chevR: `<path d="M9.5 6 15 12l-5.5 6" ${P}/>`,
   chevD: `<path d="M6 9.5 12 15l6-5.5" ${P}/>`,

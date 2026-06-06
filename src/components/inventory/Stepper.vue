@@ -34,7 +34,7 @@ function inc() {
       :aria-label="`Diminuer ${ariaLabel ?? ''}`.trim()"
       @click="dec"
     >
-      <Icon name="x" :size="12" style="transform: rotate(45deg)" />
+      <Icon name="minus" :size="12" />
     </button>
     <span class="num">{{ modelValue }}</span>
     <button
