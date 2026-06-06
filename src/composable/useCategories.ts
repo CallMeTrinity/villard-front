@@ -41,13 +41,17 @@ export function useCategories() {
         items.value.filter(c => c.inventoryItems.length > 0),
     )
 
+    const forShopping = computed(() =>
+        items.value.filter(c => c.shoppingItems.length > 0),
+    )
+
     function findByIri(iri: string): DisplayCategory | null {
         return items.value.find(c => c['@id'] === iri) ?? null
     }
 
     onMounted(fetchAll)
 
-    return {items, forInventory, state, errorMessage, fetchAll, findByIri}
+    return {items, forInventory, forShopping, state, errorMessage, fetchAll, findByIri}
 }
 
 function formatError(err: unknown): string {
