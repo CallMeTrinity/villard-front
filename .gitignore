@@ -4,4 +4,5 @@
 /design
 .env.local
 .env.*.local
+.env.deploy
 /dist
