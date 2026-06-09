@@ -31,6 +31,7 @@ const currentUserIri = computed(() => {
 
 const query = ref('')
 const statusFilter = ref<WorkStatus | 'all' | 'open'>('open')
+const yearFilter = ref<number | 'all'>('all')
 const actionError = ref<string | null>(null)
 
 const modalOpen = ref(false)
@@ -93,6 +94,47 @@ const counts = computed(() => {
 const openCount = computed(
   () => counts.value.suggested + counts.value.planned + counts.value.in_progress,
 )
+
+const doneWorks = computed(() =>
+  works.items.value.filter(w => w.status === 'done'),
+)
+
+function completionYear(work: Work): number | null {
+  const ref = work.completedAt ?? work.scheduledFor ?? work.createdAt
+  if (!ref) return null
+  const d = new Date(ref)
+  return Number.isNaN(d.getTime()) ? null : d.getFullYear()
+}
+
+const availableYears = computed<number[]>(() => {
+  const set = new Set<number>()
+  for (const w of doneWorks.value) {
+    const y = completionYear(w)
+    if (y !== null) set.add(y)
+  }
+  return [...set].sort((a, b) => b - a)
+})
+
+const doneInYear = computed(() =>
+  doneWorks.value.filter(w => {
+    if (yearFilter.value === 'all') return true
+    return completionYear(w) === yearFilter.value
+  }),
+)
+
+const totalActualCost = computed(() =>
+  doneInYear.value.reduce((sum, w) => sum + (w.actualCost ?? 0), 0),
+)
+
+const countWithCost = computed(
+  () => doneInYear.value.filter(w => w.actualCost !== null && w.actualCost !== undefined).length,
+)
+
+const costFormatter = new Intl.NumberFormat('fr-FR', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+})
 
 function onNew() {
   modalInitial.value = { mode: 'create' }
@@ -198,6 +240,24 @@ async function retryInitial() {
           {{ actionError }}
         </div>
 
+        <div v-if="doneWorks.length" class="stats-bar">
+          <div class="stat">
+            <span class="stat-label">Coût réel cumulé</span>
+            <strong class="stat-value">{{ costFormatter.format(totalActualCost) }}</strong>
+            <span class="stat-meta muted">
+              {{ countWithCost }} / {{ doneInYear.length }} travaux chiffrés
+            </span>
+          </div>
+          <label class="year-select" v-if="availableYears.length">
+            <span class="sr-only">Filtrer par année</span>
+            <Icon name="calendar" :size="13" class="muted-icon" />
+            <select v-model="yearFilter">
+              <option :value="'all'">Toutes les années</option>
+              <option v-for="y in availableYears" :key="y" :value="y">{{ y }}</option>
+            </select>
+          </label>
+        </div>
+
         <div class="filters">
           <button
             type="button"
@@ -277,6 +337,71 @@ async function retryInitial() {
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
+}
+
+.stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--sh-1);
+}
+.stat {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.stat-value {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+}
+.stat-meta {
+  font-size: 12px;
+}
+.year-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper, #fff);
+}
+.year-select select {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  padding-right: 2px;
+}
+.year-select select:focus { outline: none; }
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 
 .filters {
