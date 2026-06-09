@@ -32,7 +32,7 @@ const currentUserIri = computed(() => {
 const query = ref('')
 const statusFilter = ref<WorkStatus | 'all' | 'open'>('open')
 const yearFilter = ref<number | 'all'>('all')
-const actionError = ref<string | null>(null)
+const modalSaveError = ref<string | null>(null)
 
 const modalOpen = ref(false)
 const modalInitial = ref<ModalInitial | null>(null)
@@ -149,10 +149,11 @@ function onEdit(work: Work) {
 function closeModal() {
   modalOpen.value = false
   modalInitial.value = null
+  modalSaveError.value = null
 }
 
 async function onSave(payload: WorkSavePayload) {
-  actionError.value = null
+  modalSaveError.value = null
   try {
     const body = {
       title: payload.title,
@@ -171,17 +172,17 @@ async function onSave(payload: WorkSavePayload) {
     }
     closeModal()
   } catch (err) {
-    actionError.value = formatError(err)
+    modalSaveError.value = formatError(err)
   }
 }
 
 async function onRemove(id: number) {
-  actionError.value = null
+  modalSaveError.value = null
   try {
     await works.remove(id)
     closeModal()
   } catch (err) {
-    actionError.value = formatError(err)
+    modalSaveError.value = formatError(err)
   }
 }
 
@@ -235,11 +236,6 @@ async function retryInitial() {
       </div>
 
       <template v-else>
-        <div v-if="actionError" class="action-error">
-          <Icon name="alert" :size="15" />
-          {{ actionError }}
-        </div>
-
         <div v-if="doneWorks.length" class="stats-bar">
           <div class="stat">
             <span class="stat-label">Coût réel cumulé</span>
@@ -315,6 +311,7 @@ async function retryInitial() {
     :open="modalOpen"
     :initial="modalInitial"
     :can-delete="canDeleteCurrent"
+    :save-error="modalSaveError"
     @close="closeModal"
     @save="onSave"
     @remove="onRemove"
@@ -325,19 +322,6 @@ async function retryInitial() {
 .muted-icon { color: var(--ink-3); }
 .pad-center { padding: 48px; text-align: center; }
 .error-msg { color: var(--replace); margin-bottom: 16px; }
-
-.action-error {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  margin-bottom: 14px;
-  background: var(--replace-bg);
-  color: #8c3a2e;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-}
 
 .stats-bar {
   display: flex;

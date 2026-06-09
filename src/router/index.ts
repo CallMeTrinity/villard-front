@@ -52,6 +52,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/ArchitectureView.vue'),
         meta: {requireAuth: true}
     },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'not-found',
+        component: () => import('@/views/NotFoundView.vue'),
+        meta: {requireAuth: true}
+    },
 ]
 
 const router = createRouter({

@@ -36,6 +36,7 @@ const props = defineProps<{
   open: boolean
   initial: ModalInitial | null
   canDelete: boolean
+  saveError?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -59,6 +60,13 @@ const isEditing = computed(() => props.initial?.mode === 'edit')
 const editingId = computed(() =>
   props.initial?.mode === 'edit' ? props.initial.work.id : null,
 )
+
+watch(() => props.saveError, (err) => {
+  if (err) {
+    errorMessage.value = err
+    saving.value = false
+  }
+})
 
 watch(() => props.open, (open) => {
   if (!open) return

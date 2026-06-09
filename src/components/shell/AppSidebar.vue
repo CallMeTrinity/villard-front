@@ -89,8 +89,8 @@ const gestion: NavItem[] = [
       <div class="host-pill">
         <span class="host-dot" />
         <div class="host-text">
-          <b>Auto-hébergé</b><br />
-          home.lan · vos données
+          <b>Infomaniak</b><br />
+          Suisse · vos données
         </div>
       </div>
       <button
