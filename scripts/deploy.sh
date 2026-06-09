@@ -13,8 +13,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="${SCRIPT_DIR}/.env.deploy"
-DIST_DIR="${SCRIPT_DIR}/dist"
+ENV_FILE="${SCRIPT_DIR}/../.env.deploy"
+DIST_DIR="${SCRIPT_DIR}/../dist"
 
 SKIP_BUILD=0
 for arg in "$@"; do
