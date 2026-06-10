@@ -3,12 +3,16 @@
 # Build the site and deploy it to Infomaniak via SFTP.
 #
 # Usage:
-#   1. cp .env.deploy .env.deploy
-#   2. Fill in your credentials in .env.deploy
+#   1. cp .env.deploy.example .env.deploy
+#   2. Fill in your settings in .env.deploy (host, user, remote dir, SSH key)
 #   3. ./deploy.sh        (full deploy: build + upload)
 #      ./deploy.sh --skip-build   (upload existing dist/ only)
 #
-# Requirements: lftp (brew install lftp)
+# Authentication uses a dedicated SSH key (no password anywhere), so deploy
+# credentials never appear in the process list (`ps aux`) nor on disk.
+#
+# Upload is done with rsync over ssh (mirrors dist/ with --delete).
+# Requirements: rsync, both locally and on the remote host.
 
 set -euo pipefail
 
@@ -37,13 +41,22 @@ set +a
 
 : "${SFTP_HOST:?SFTP_HOST is required in .env.deploy}"
 : "${SFTP_USER:?SFTP_USER is required in .env.deploy}"
-: "${SFTP_PASSWORD:?SFTP_PASSWORD is required in .env.deploy}"
 : "${SFTP_REMOTE_DIR:?SFTP_REMOTE_DIR is required in .env.deploy}"
 SFTP_PORT="${SFTP_PORT:-22}"
+SFTP_SSH_KEY="${SFTP_SSH_KEY:-$HOME/.ssh/id_villard}"
+# Expand a leading ~ to the home directory.
+SFTP_SSH_KEY="${SFTP_SSH_KEY/#\~/$HOME}"
 
-if ! command -v lftp >/dev/null 2>&1; then
-  echo "✗ lftp is not installed." >&2
-  echo "  Install with: brew install lftp" >&2
+if [[ ! -f "$SFTP_SSH_KEY" ]]; then
+  echo "✗ SSH key not found at $SFTP_SSH_KEY." >&2
+  echo "  Generate one with: ssh-keygen -t ed25519 -f \"$SFTP_SSH_KEY\" -C villard-deploy" >&2
+  echo "  then add the .pub key to your Infomaniak SSH keys." >&2
+  exit 1
+fi
+
+if ! command -v rsync >/dev/null 2>&1; then
+  echo "✗ rsync is not installed locally." >&2
+  echo "  Install with: brew install rsync" >&2
   exit 1
 fi
 
@@ -59,14 +72,12 @@ fi
 
 echo "→ Uploading dist/ to ${SFTP_USER}@${SFTP_HOST}:${SFTP_REMOTE_DIR} (port ${SFTP_PORT})…"
 
-lftp -c "
-set sftp:auto-confirm yes;
-set ftp:ssl-allow no;
-set net:max-retries 2;
-set net:timeout 15;
-open -u '${SFTP_USER}','${SFTP_PASSWORD}' -p ${SFTP_PORT} sftp://${SFTP_HOST};
-mirror -R --delete --verbose --exclude-glob .DS_Store '${DIST_DIR}/' '${SFTP_REMOTE_DIR}';
-bye;
-"
+# BatchMode=yes: fail fast instead of falling back to an interactive password
+# prompt if key auth ever breaks. IdentitiesOnly=yes: offer only our key.
+SSH_CMD="ssh -i ${SFTP_SSH_KEY} -p ${SFTP_PORT} -o IdentitiesOnly=yes -o BatchMode=yes"
+
+rsync -az --delete --exclude='.DS_Store' \
+  -e "${SSH_CMD}" \
+  "${DIST_DIR}/" "${SFTP_USER}@${SFTP_HOST}:${SFTP_REMOTE_DIR}/"
 
 echo "✓ Deployed to https://${SFTP_HOST%%.*}… (replace with your actual domain)"
