@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { AxiosError } from 'axios'
+import { formatError } from '@/utils/formatError'
 import AppTopbar from '@/components/shell/AppTopbar.vue'
 import Icon from '@/components/icons/Icon.vue'
 import ShoppingRow from '@/components/shopping/ShoppingRow.vue'
@@ -177,16 +177,6 @@ async function clearPurchased() {
     actionError.value = 'Certains articles n’ont pas pu être supprimés.'
   }
 }
-
-function formatError(err: unknown): string {
-  if (err instanceof AxiosError) {
-    if (err.response?.status === 403) return 'Action non autorisée.'
-    if (err.response?.status === 422) return 'Données invalides.'
-    if (err.code === 'ERR_NETWORK') return 'Impossible de joindre le serveur.'
-  }
-  return 'Une erreur est survenue.'
-}
-
 async function retryInitial() {
   await Promise.all([shopping.fetchAll(), categories.fetchAll()])
 }

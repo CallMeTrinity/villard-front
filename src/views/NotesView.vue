@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { AxiosError } from 'axios'
+import { formatError } from '@/utils/formatError'
 import AppTopbar from '@/components/shell/AppTopbar.vue'
 import Icon from '@/components/icons/Icon.vue'
 import NoteCard from '@/components/notes/NoteCard.vue'
@@ -99,16 +99,6 @@ async function onRemove(id: number) {
     actionError.value = formatError(err)
   }
 }
-
-function formatError(err: unknown): string {
-  if (err instanceof AxiosError) {
-    if (err.response?.status === 403) return 'Action non autorisée.'
-    if (err.response?.status === 422) return 'Données invalides.'
-    if (err.code === 'ERR_NETWORK') return 'Impossible de joindre le serveur.'
-  }
-  return 'Une erreur est survenue.'
-}
-
 const canDeleteCurrent = computed(() => {
   const init = modalInitial.value
   if (!init || init.mode !== 'edit') return false

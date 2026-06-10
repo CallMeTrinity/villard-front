@@ -1,6 +1,6 @@
 import {categoriesApi, type Category} from "@/api/category.ts";
 import {computed, onMounted, ref} from "vue";
-import {AxiosError} from "axios";
+import { formatError } from '@/utils/formatError'
 
 type AsyncState = 'idle' | 'loading' | 'error' | 'success'
 
@@ -52,11 +52,4 @@ export function useCategories() {
     onMounted(fetchAll)
 
     return {items, forInventory, forShopping, state, errorMessage, fetchAll, findByIri}
-}
-
-function formatError(err: unknown): string {
-    if (err instanceof AxiosError && err.code === 'ERR_NETWORK') {
-        return 'Impossible de joindre le serveur.'
-    }
-    return 'Une erreur est survenue.'
 }

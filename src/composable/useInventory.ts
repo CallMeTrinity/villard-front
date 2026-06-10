@@ -1,5 +1,5 @@
 import { onMounted, ref } from 'vue'
-import { AxiosError } from 'axios'
+import { formatError } from '@/utils/formatError'
 import {
     inventoryApi,
     type InventoryItem,
@@ -63,12 +63,4 @@ export function useInventory() {
     onMounted(fetchAll)
 
     return { items, state, errorMessage, fetchAll, create, update, patch, remove }
-}
-
-function formatError(err: unknown): string {
-    if (err instanceof AxiosError) {
-        if (err.code === 'ERR_NETWORK') return 'Impossible de joindre le serveur.'
-        if (err.response?.status === 403) return "Vous n'avez pas les droits nécessaires."
-    }
-    return 'Une erreur est survenue.'
 }

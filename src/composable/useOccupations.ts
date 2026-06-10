@@ -5,7 +5,7 @@ import {
     type OccupationUpdatePayload,
     occupationsApi,
 } from "@/api/occupation.ts";
-import {AxiosError} from "axios";
+import { formatError } from '@/utils/formatError'
 
 type AsyncState = 'idle' | 'loading' | 'error' | 'success'
 export function useOccupations() {
@@ -56,16 +56,4 @@ export function useOccupations() {
         update,
         remove,
     }
-}
-
-function formatError(err: unknown) : string {
-    if (err instanceof AxiosError) {
-        if (err.code === 'ERR_NETWORK') {
-            return 'Impossible de joindre le serveur.'
-        }
-        if (err.response?.status === 403) {
-            return 'Vous n\'avez pas les droits nécessaires.'
-        }
-    }
-    return 'Une erreur est survenue.'
 }
