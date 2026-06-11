@@ -1,0 +1,63 @@
+name: Deploy Front
+
+# Build le SPA et le met en ligne sur l'hébergement Infomaniak.
+#  - push d'un tag `vX.Y.Z` -> build de prod + upload rsync du dist/
+#  - lancement manuel        -> idem (utile pour redéployer sans tagger)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Un seul déploiement à la fois : si plusieurs tags sont poussés coup sur coup,
+# on annule le déploiement en cours pour ne pas se marcher dessus sur le serveur.
+concurrency:
+  group: deploy-front
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        # Utilise .env.production (commité) -> VITE_API_URL.
+        # Surchargeable via la variable de dépôt VITE_API_URL si définie.
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npm run build
+
+      - name: Configure SSH key
+        run: |
+          install -m 700 -d ~/.ssh
+          install -m 600 /dev/stdin ~/.ssh/id_villard <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+          ssh-keyscan -p "${{ vars.SFTP_PORT }}" -H "${{ vars.SFTP_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Upload dist/ via rsync
+        env:
+          SFTP_HOST: ${{ vars.SFTP_HOST }}
+          SFTP_USER: ${{ vars.SFTP_USER }}
+          SFTP_PORT: ${{ vars.SFTP_PORT }}
+          SFTP_REMOTE_DIR: ${{ vars.SFTP_REMOTE_DIR }}
+        run: |
+          rsync -az --delete --exclude='.DS_Store' \
+            -e "ssh -i ~/.ssh/id_villard -p ${SFTP_PORT} -o IdentitiesOnly=yes -o BatchMode=yes" \
+            dist/ "${SFTP_USER}@${SFTP_HOST}:${SFTP_REMOTE_DIR}/"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_villard
