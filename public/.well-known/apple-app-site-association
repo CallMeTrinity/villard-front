@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.marmottesindustries.lesmarmottes"],
+        "components": [
+          { "/": "*", "comment": "Ouvre l'app pour toutes les URLs du domaine" }
+        ]
+      }
+    ]
+  }
+}

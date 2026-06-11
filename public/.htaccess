@@ -11,6 +11,13 @@
   RewriteRule ^ index.html [L]
 </IfModule>
 
+# Universal Links (iOS) — le fichier apple-app-site-association n'a pas
+# d'extension, donc on force son type MIME en application/json sinon iOS
+# l'ignore. (assetlinks.json est déjà servi en JSON grâce à son extension.)
+<Files "apple-app-site-association">
+  ForceType application/json
+</Files>
+
 # Cache hashed assets aggressively (Vite emits content-hashed filenames)
 <IfModule mod_expires.c>
   ExpiresActive On
